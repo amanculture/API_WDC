@@ -1,49 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="https://public.tableau.com/javascripts/api/tableauwdc-2.3.0.js"></script>
-  </head>
-  <body>
-    <h1>Web Data Connector Example</h1>
-    <button onclick="getData()">Get Data</button>
+<head>
+  <title>Web Data Connector for Restful API</title>
+  <script src="https://public.tableau.com/javascripts/api/tableauwdc-2.3.0.js"></script>
+</head>
+<body>
+  <h1>Restful API WDC</h1>
+  <button onclick="getData()">Get Data</button>
 
-    <script>
-      var myConnector = tableau.makeConnector();
+  <script>
+    var myConnector = tableau.makeConnector();
 
-      myConnector.getSchema = function(schemaCallback) {
-        var cols = [
-          { id: "id", dataType: tableau.dataTypeEnum.string },
-          { id: "name", dataType: tableau.dataTypeEnum.string },
-          { id: "value", dataType: tableau.dataTypeEnum.float }
-        ];
+    // Define the schema for the data
+    myConnector.getSchema = function(schemaCallback) {
+      var cols = [
+        { id: "id", dataType: tableau.dataTypeEnum.int },
+        { id: "name", dataType: tableau.dataTypeEnum.string },
+        { id: "value", dataType: tableau.dataTypeEnum.float }
+      ];
 
-        var tableInfo = {
-          id: "myTable",
-          alias: "My Data Source",
-          columns: cols
-        };
-
-        schemaCallback([tableInfo]);
+      var tableInfo = {
+        id: "apiData",            // Unique ID for the table
+        alias: "API Data Source", // Friendly name of the table
+        columns: cols             // Define the columns based on the API response
       };
 
-      myConnector.getData = function(table, doneCallback) {
-        var apiUrl = 'https://api.restful-api.dev/objects'; // Replace with actual API
-        fetch(apiUrl)
-          .then(response => response.json())
-          .then(data => {
-            var tableData = data.map(item => ({
-              id: item.id,
-              name: item.name,
-              value: item.value
-            }));
+      schemaCallback([tableInfo]); // Pass the schema to Tableau
+    };
 
-            table.appendRows(tableData);
-            doneCallback();
-          })
-          .catch(err => console.error('Error fetching data:', err));
-      };
+    // Fetch data from the REST API and send it to Tableau
+    myConnector.getData = function(table, doneCallback) {
+      var apiUrl = "https://api.restful-api.dev/objects"; // API endpoint
 
-      tableau.registerConnector(myConnector);
-    </script>
-  </body>
+      // Fetch the data from the API
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          // Process the data and map it into Tableau's format
+          var tableData = data.data.map(item => ({
+            id: item.id,        // ID field from API
+            name: item.name,    // Name field from API
+            value: item.value   // Value field from API
+          }));
+
+          // Append the rows to the table in Tableau
+          table.appendRows(tableData);
+
+          doneCallback(); // Call the doneCallback to signal Tableau that the data is ready
+        })
+        .catch(err => {
+          console.error('Error fetching data:', err);
+        });
+    };
+
+    tableau.registerConnector(myConnector); // Register the connector
+  </script>
+</body>
 </html>
