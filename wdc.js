@@ -1,43 +1,53 @@
 (function() {
     var myConnector = tableau.makeConnector();
 
+    // Define the schema (structure of the data)
     myConnector.getSchema = function(schemaCallback) {
         var cols = [
-            { id: "id", alias: "ID", dataType: tableau.dataTypeEnum.int },
-            { id: "name", alias: "Name", dataType: tableau.dataTypeEnum.string },
-            { id: "email", alias: "Email", dataType: tableau.dataTypeEnum.string },
-            // Add more fields as needed
+            { id: "id", alias: "ID", dataType: tableau.dataTypeEnum.string },
+            { id: "urn", alias: "URN", dataType: tableau.dataTypeEnum.string },
+            { id: "username", alias: "Username", dataType: tableau.dataTypeEnum.string },
+            { id: "firstname", alias: "First Name", dataType: tableau.dataTypeEnum.string },
+            // Add other fields from the LinkedIn API as needed
         ];
 
         var tableSchema = {
-            id: "databaseData",
-            alias: "Data from Database API",
+            id: "linkedinData",
+            alias: "LinkedIn Data from API",
             columns: cols
         };
 
         schemaCallback([tableSchema]);
     };
 
+    // Fetch data from the LinkedIn Data API using the API key
     myConnector.getData = function(table, doneCallback) {
-        var apiKey = "test_ifcEpufIrhFZQkmCeyafvrIEo87hUObwqgCKyXVT";  // Replace with your actual API key
-        var apiUrl = "https://api.nettoolkit.com/v1/account/test-api-keys"; // Replace with your actual API endpoint
+        var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206"; // Your API Key
+        var apiUrl = "https://linkedin-data-api.p.rapidapi.com/"; // Base URL
 
-        // Use Fetch or XMLHttpRequest to call your API
-        fetch(apiUrl, {
+        // Add your specific API endpoint (e.g., search profiles, company data)
+        var endpoint = "some_endpoint"; // Modify with the correct endpoint
+
+        // Fetch data from the LinkedIn API
+        fetch(apiUrl + endpoint, {
             method: 'GET',
             headers: {
-                "Authorization": "Bearer " + apiKey,
+                "X-RapidAPI-Key": apiKey,
+                "X-RapidAPI-Host": "linkedin-data-api.p.rapidapi.com",
                 "Content-Type": "application/json"
             }
         })
         .then(response => response.json())
         .then(data => {
             var tableData = data.map(item => ({
-                created: item.created,
-                ip: item.ip,
+                id: item.id,
+                name: item.name,
+                position: item.position,
+                location: item.location,
                 // Map other fields as needed
             }));
 
+            // Append rows to Tableau
             table.appendRows(tableData);
             doneCallback();
         })
