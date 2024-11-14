@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkedIn Data Web Data Connector</title>
     <script type="text/javascript" src="https://tableau.github.io/webdataconnector/libs/tableauwdc-2.3.0.js"></script>
+    <script type="text/javascript" src="https://connectors.tableau.com/libs/tableauwdc-2.0.latest.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
         var linkedinConnector = tableau.makeConnector();
 
@@ -39,7 +41,7 @@
         linkedinConnector.getData = function(table, doneCallback) {
             var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206";
             var apiUrl = "https://linkedin-data-api.p.rapidapi.com/";
-            var endpoint = "your_endpoint"; // Specify the actual LinkedIn data endpoint you want to use
+            var endpoint = "profile"; // Specify the actual LinkedIn data endpoint you want to use
 
             // Making the API call to the LinkedIn Data API
             fetch(apiUrl + endpoint, {
