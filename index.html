@@ -43,10 +43,10 @@
         linkedinConnector.getData = function(table, doneCallback) {
             var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206";  // Replace with your actual API Key
             var apiUrl = "https://linkedin-data-api.p.rapidapi.com/";
-            var endpoint = "profile";  // Specify your endpoint here (e.g., profile, connections)
+            //var endpoint = "profile";  // Specify your endpoint here (e.g., profile, connections)
 
             var allRows = [];  // Array to store all rows of data
-            var nextPageUrl = apiUrl + endpoint;  // Start with the first page of data
+            var nextPageUrl = apiUrl;  // Start with the first page of data
 
             function fetchPage(url) {
                 fetch(url, {
