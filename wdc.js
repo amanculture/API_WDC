@@ -41,9 +41,9 @@
         .then(data => {
             var tableData = data.map(item => ({
                 id: item.id,
-                name: item.name,
-                position: item.position,
-                location: item.location,
+                urn: item.urn,
+                username: item.username,
+                firstname: item.firstname,
                 // Map other fields as needed
             }));
 
