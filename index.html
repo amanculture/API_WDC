@@ -31,7 +31,7 @@
 
     // Define the function to fetch data from the API and send it to Tableau
     myConnector.getData = function(table, doneCallback) {
-      var apiUrl = "https://api.restful-api.dev/objects";  // The REST API endpoint
+      var apiUrl = "https://api.coindesk.com/v1/bpi/currentprice.json";  // The REST API endpoint
 
       // Use fetch() to send a GET request to the API
       fetch(apiUrl)
