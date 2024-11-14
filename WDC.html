@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://public.tableau.com/javascripts/api/tableauwdc-2.3.0.js"></script>
+  </head>
+  <body>
+    <h1>Web Data Connector Example</h1>
+    <button onclick="getData()">Get Data</button>
+
+    <script>
+      var myConnector = tableau.makeConnector();
+
+      myConnector.getSchema = function(schemaCallback) {
+        var cols = [
+          { id: "id", dataType: tableau.dataTypeEnum.string },
+          { id: "name", dataType: tableau.dataTypeEnum.string },
+          { id: "value", dataType: tableau.dataTypeEnum.float }
+        ];
+
+        var tableInfo = {
+          id: "myTable",
+          alias: "My Data Source",
+          columns: cols
+        };
+
+        schemaCallback([tableInfo]);
+      };
+
+      myConnector.getData = function(table, doneCallback) {
+        var apiUrl = 'https://api.restful-api.dev/objects'; // Replace with actual API
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            var tableData = data.map(item => ({
+              id: item.id,
+              name: item.name,
+              value: item.value
+            }));
+
+            table.appendRows(tableData);
+            doneCallback();
+          })
+          .catch(err => console.error('Error fetching data:', err));
+      };
+
+      tableau.registerConnector(myConnector);
+    </script>
+  </body>
+</html>
