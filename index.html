@@ -1,61 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Web Data Connector for Restful API</title>
-  <script src="https://public.tableau.com/javascripts/api/tableauwdc-2.3.0.js"></script>
+    <meta charset="UTF-8">
+    <title>Tableau WDC - Database API</title>
+    <script type="text/javascript" src="wdc.js"></script>
 </head>
 <body>
-  <h1>Restful API WDC</h1>
-  <button onclick="getData()">Get Data</button>
-
-  <script>
-    // Create a connector object using Tableau's JavaScript API
-    var myConnector = tableau.makeConnector();
-
-    // Define the schema (structure) of the data that Tableau will work with
-    myConnector.getSchema = function(schemaCallback) {
-      var cols = [
-        { id: "id", dataType: tableau.dataTypeEnum.int },
-        { id: "name", dataType: tableau.dataTypeEnum.string },
-        { id: "value", dataType: tableau.dataTypeEnum.float }
-      ];
-
-      var tableInfo = {
-        id: "apiData",  // Unique internal reference for the data table
-        alias: "API Data Source",  // User-friendly table name
-        columns: cols  // Table columns (based on the structure of the data from the API)
-      };
-
-      schemaCallback([tableInfo]);  // Pass the table schema to Tableau
-    };
-
-    // Define the function to fetch data from the API and send it to Tableau
-    myConnector.getData = function(table, doneCallback) {
-      var apiUrl = "https://api.coindesk.com/v1/bpi/currentprice.json";  // The REST API endpoint
-
-      // Use fetch() to send a GET request to the API
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          // Map the API response to Tableau's expected format
-          var tableData = data.data.map(item => ({
-            id: item.id,        // Map the 'id' field from API response to 'id' column
-            name: item.name,    // Map 'name' to 'name' column
-            value: item.value   // Map 'value' to 'value' column
-          }));
-
-          // Append the fetched rows to the table in Tableau
-          table.appendRows(tableData);
-
-          doneCallback();  // Notify Tableau that the data is ready
-        })
-        .catch(err => {
-          console.error('Error fetching data:', err);  // Handle errors
-        });
-    };
-
-    // Register the WDC with Tableau
-    tableau.registerConnector(myConnector);
-  </script>
+    <h1>Connect to Database using API Key</h1>
+    <div>
+        <button id="getDataButton">Get Data</button>
+        <div id="status">Status: Not connected</div>
+    </div>
 </body>
 </html>
