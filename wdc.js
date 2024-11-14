@@ -20,7 +20,7 @@
 
     myConnector.getData = function(table, doneCallback) {
         var apiKey = "test_ifcEpufIrhFZQkmCeyafvrIEo87hUObwqgCKyXVT";  // Replace with your actual API key
-        var apiUrl = "curl "https://api.nettoolkit.com/v1/account/test-api-keys""; // Replace with your actual API endpoint
+        var apiUrl = "https://api.nettoolkit.com/v1/account/test-api-keys"; // Replace with your actual API endpoint
 
         // Use Fetch or XMLHttpRequest to call your API
         fetch(apiUrl, {
@@ -33,9 +33,8 @@
         .then(response => response.json())
         .then(data => {
             var tableData = data.map(item => ({
-                id: item.id,
-                name: item.name,
-                email: item.email
+                created: item.created,
+                ip: item.ip,
                 // Map other fields as needed
             }));
 
