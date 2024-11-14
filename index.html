@@ -9,17 +9,19 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
         var linkedinConnector = tableau.makeConnector();
+
+        // Initialization function
         linkedinConnector.init = function(initCallback) {
-            // Initialize the connector (can store API Key and other settings here)
             if (tableau.phase == tableau.phaseEnum.interactivePhase) {
                 if (tableau.connectionData) {
                     var connector = JSON.parse(tableau.connectionData);
-                    $("#apiKey").val(connector.apiKey);
+                    $("#apiKey").val(connector.apiKey);  // Set API Key if available
                 }
             }
             initCallback();
         };
 
+        // Get schema to define data columns
         linkedinConnector.getSchema = function(schemaCallback) {
             var cols = [
                 { id: "id", alias: "ID", dataType: tableau.dataTypeEnum.string },
@@ -37,49 +39,86 @@
             schemaCallback([tableSchema]);
         };
 
+        // Get data and handle pagination if necessary
         linkedinConnector.getData = function(table, doneCallback) {
-            var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206";
+            var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206";  // Replace with your actual API Key
             var apiUrl = "https://linkedin-data-api.p.rapidapi.com/";
-            
+            var endpoint = "profile";  // Specify your endpoint here (e.g., profile, connections)
 
-            // Making the API call to the LinkedIn Data API
-            fetch(apiUrl , {
-                method: 'GET',
-                headers: {
-                    "X-RapidAPI-Key": apiKey,
-                    "X-RapidAPI-Host": "linkedin-data-api.p.rapidapi.com",
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Process the data and map it to Tableau-friendly format
-                var tableData = data.data.map(item => ({
-                    id: item.id,
-                    urn: item.urn,
-                    username: item.username,
-                    firstname: item.firstName
-                }));
+            var allRows = [];  // Array to store all rows of data
+            var nextPageUrl = apiUrl + endpoint;  // Start with the first page of data
 
-                // Append rows to Tableau's data table
-                table.appendRows(tableData);
-                doneCallback();
-            })
-            .catch(error => {
-                console.error("Error fetching LinkedIn data: ", error);
-                doneCallback();
-            });
+            function fetchPage(url) {
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        "X-RapidAPI-Key": apiKey,
+                        "X-RapidAPI-Host": "linkedin-data-api.p.rapidapi.com",
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Process current page data and add it to allRows
+                    var tableData = data.data.map(item => ({
+                        id: item.id,
+                        urn: item.urn,
+                        username: item.username,
+                        firstname: item.firstname
+                    }));
+
+                    // Append rows to the allRows array
+                    allRows = allRows.concat(tableData);
+
+                    // Check for next page
+                    if (data.nextPage) {
+                        // Fetch the next page if it exists
+                        fetchPage(data.nextPage);
+                    } else {
+                        // No more pages, send all data to Tableau
+                        table.appendRows(allRows);
+                        doneCallback();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching LinkedIn data: ", error);
+                    doneCallback();
+                });
+            }
+
+            // Start fetching the first page
+            fetchPage(nextPageUrl);
         };
 
         tableau.registerConnector(linkedinConnector);
 
         $(document).ready(function() {
+            // Handle the form submission
             $("#input-form").on("submit", function(e) {
                 e.preventDefault();
                 if (this.checkValidity()) {
                     var data = {
-                        apiKey: $("#apiKey").val()
+                        apiKey: $("#apiKey").val()  // Store the API key entered by the user
                     };
 
-                    tableau.connectionData = JSON.stringify(data);
-                    tableau.connectionName = "LinkedIn Data"; // Set a name for the
+                    tableau.connectionData = JSON.stringify(data);  // Store connection data in Tableau
+                    tableau.connectionName = "LinkedIn Data"; // Set name for Tableau data source
+                    tableau.submit(); // Submit the connector to Tableau
+                } else {
+                    this.classList.add("was-validated");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>LinkedIn Web Data Connector</h1>
+    <form id="input-form">
+        <div class="form-group">
+            <label for="apiKey">API Key:</label>
+            <input type="text" id="apiKey" class="form-control" value="8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206" required disabled />
+        </div>
+        <button type="submit" class="btn btn-primary">Connect</button>
+    </form>
+</body>
+</html>
