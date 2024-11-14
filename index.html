@@ -9,7 +9,6 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript">
         var linkedinConnector = tableau.makeConnector();
-
         linkedinConnector.init = function(initCallback) {
             // Initialize the connector (can store API Key and other settings here)
             if (tableau.phase == tableau.phaseEnum.interactivePhase) {
@@ -26,7 +25,7 @@
                 { id: "id", alias: "ID", dataType: tableau.dataTypeEnum.string },
                 { id: "urn", alias: "URN", dataType: tableau.dataTypeEnum.string },
                 { id: "username", alias: "Username", dataType: tableau.dataTypeEnum.string },
-                { id: "first_name", alias: "First Name", dataType: tableau.dataTypeEnum.string }
+                { id: "firstname", alias: "First Name", dataType: tableau.dataTypeEnum.string }
             ];
 
             var tableSchema = {
@@ -41,10 +40,10 @@
         linkedinConnector.getData = function(table, doneCallback) {
             var apiKey = "8b2d55889bmshafe33f821c7a253p15f9bejsnd92ff5f9a206";
             var apiUrl = "https://linkedin-data-api.p.rapidapi.com/";
-            var endpoint = "profile"; // Specify the actual LinkedIn data endpoint you want to use
+            
 
             // Making the API call to the LinkedIn Data API
-            fetch(apiUrl + endpoint, {
+            fetch(apiUrl , {
                 method: 'GET',
                 headers: {
                     "X-RapidAPI-Key": apiKey,
@@ -59,7 +58,7 @@
                     id: item.id,
                     urn: item.urn,
                     username: item.username,
-                    first_name: item.firstName
+                    firstname: item.firstName
                 }));
 
                 // Append rows to Tableau's data table
